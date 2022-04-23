@@ -270,7 +270,7 @@ end
 
 RPNCalc.new.start
 
-# exemple of expressions:
+# example of expressions:
 # { dup doif__opo } abs
 # { 2 cpyn - dup abs dup doif_/_pop } greater
 # { swap greater } lesser or { greater opo } lesser
