@@ -42,7 +42,7 @@ class RPNCalc
 			print "\e[H\e[2J" # scroll down
 			backupArr = stack.map(&.dup) 
 			@numbers_in_line = 0
-			@input_queue << input.gsub('\t', " ").split(" ", remove_empty: true).select{|e|!e.empty?}
+			@input_queue << input.gsub('\t', " ").split(" ", remove_empty: true)
 			
 			while(word = @input_queue.shift?)
 				word = @pool.get(word)
