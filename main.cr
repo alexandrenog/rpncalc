@@ -1,3 +1,5 @@
+require "string_pool"
+
 class Array(T)
 	def <<(arr : Array(T)) : Array(T)
 		self.concat(arr)
@@ -8,6 +10,7 @@ class Deque(T)
 		self.concat(arr)
 	end
 end
+
 macro backup_from_error
 	@stack = backupArr
 end
@@ -17,11 +20,11 @@ class RPNCalc
 	ZERO_DIVISION = "Error: Can't divide by 0"
 	property stack, operations
 	def initialize
-		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto pop sum mult del deln , . qtt qtty opo inv max min swp swap cmds help { } expr exit out repeat_ doif_)
-		@operations_string = "Math: [+] [-] [*] [/] [**|pow] sq sqrt opo inv sum mult max min             Help: [help|cmds]\n"
-		@operations_string+= "Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]            Exit: [exit|out] \n"
+		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto pop sum mult del deln , . qtt qtty opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi)
+		@operations_string = "Math: [+] [-] [*] [/] [**|pow] sq sqrt opo inv sum mult max min rand(0~1) randi(0 to <N-1>)            Help: [help|cmds]\n"
+		@operations_string+= "Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]                                 Exit: [exit|out] \n"
 		@operations_string+= "Qtty of numbers in the line until the comma: [,]   Stack size: [.|qtt|qtty]\n"
-		@operations_string+= "Create Expression: { <w1> <w2> <w3> ... } <name>   List Expressions: expr  "
+		@operations_string+= "Create Expression: { <w1> <w2> <w3> ... } <name>   List Expressions: expr or expri(for indexes)\nDelete Expression: <N> delxpr\n"
 		@operations_string+= "Repeat <w1> N times: repeat_<w1>    Execute <w1> or <w2> conditionally: doif_<w1>_<w2>\n"
 		@stack = Array(Float64).new
 		@auxArr = Array(Float64).new
@@ -31,6 +34,7 @@ class RPNCalc
 		@expression = [] of String
 		@expressions = Hash(String,Array(String)).new
 		@input_queue = Deque(String).new
+		@pool = StringPool.new
 	end
 	def start
 		print "\e[H\e[2J" # scroll down
@@ -41,6 +45,7 @@ class RPNCalc
 			@input_queue << input.split(" ").select{|e|!e.empty?}
 			
 			while(word = @input_queue.shift?)
+				word = @pool.get(word)
 				# READ EXPRESSION
 				if(@reading_expression)
 					if(word == "{")
@@ -124,14 +129,20 @@ class RPNCalc
 			consume 1
 			return ZERO_DIVISION if a == 0
 			stack << 1.0 / a
+		elsif check "rand"
+			stack << Random.rand
+		elsif check "randi", 1
+			consume 1
+			vi = a.to_i32
+			stack << Random.rand(vi > 0 ? vi : 1) 
 		elsif check "sum", 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
-			stack << numbers.reduce(0.0){|acc, el| acc+el} 
+			stack << numbers.reduce(0.0.to_f64){|acc, el| el+acc} 
 		elsif check "mult", 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
-			stack << numbers.reduce(1.0){|acc, el| acc*el} 
+			stack << numbers.reduce(1.0.to_f64){|acc, el| el*acc} 
 		elsif check "max", 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
@@ -179,7 +190,20 @@ class RPNCalc
 		elsif check ["exit","out"]
 			exit
 		elsif check "expr"
-			puts @expressions 
+			@expressions.each do |name,words|
+				puts "{ #{words.join(" ")} } #{name}"
+			end
+		elsif check "expri"
+			@expressions.keys.each_with_index do |name,idx|
+				words = @expressions[name]
+				puts "#{idx}: { #{words.join(" ")} } #{name}"
+			end
+		elsif check "delxpr", 1
+			keys = @expressions.keys
+			return INVALID_INDEX unless stack.last.to_i32 < keys.size && stack.last.to_i32 >= 0
+			consume 1
+			@expressions.delete(keys[a.to_i32])
+			@input_queue.insert(0, "expri")
 		elsif @op.starts_with?("repeat_") && len(1)
 			consume 1
 			repeat_expr = @op.split("repeat_").last
@@ -199,11 +223,11 @@ class RPNCalc
 		end
 		return nil
 	end
-	def consume (operands : Int32)
+	def consume (operands : Number)
 		@auxArr = @stack[(stack.size-operands)...stack.size]
 		@stack.pop operands
 	end
-	def consume_pop (operands : Int32)
+	def consume_pop (operands : Number)
 		consume(operands)
 		@auxArr.pop # remove tail, usually argument
 	end
