@@ -1,2 +1,1 @@
 run = "./rpncalc"
-build = "crystal build --release rpncalc.cr"
