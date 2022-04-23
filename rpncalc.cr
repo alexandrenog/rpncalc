@@ -93,7 +93,7 @@ class RPNCalc
 					@numbers_in_line = 0 #executed with success
 				end
 			end
-			puts "[#{stack.map{|n| n % 1 == 0 ? n.to_i32.to_s : n.to_s}.join(" ")}>"
+			puts "[#{stack.map{|n| n % 1 == 0 ? n.to_i64.to_s : n.to_s}.join(" ")}>"
 		end	
 	end
 	def execute (@op : String) : String | Nil
@@ -134,7 +134,7 @@ class RPNCalc
 			stack << Random.rand
 		elsif check "randi", 1
 			consume 1
-			vi = a.to_i32
+			vi = a.to_i64
 			stack << Random.rand(vi > 0 ? vi : 1).to_f64
 		elsif check "sum", 1 
 			return INVALID_ARGUMENT unless len(qtty)
@@ -178,7 +178,7 @@ class RPNCalc
 		elsif check "cpyto", 2
 			consume 2
 			if len(b-1)
-			  	stack.insert(-(b.to_i32), a)
+			  	stack.insert(-(b.to_i64), a)
 			else
 				return INVALID_INDEX 
 	 		end
@@ -201,14 +201,14 @@ class RPNCalc
 			end
 		elsif check "delxpr", 1
 			keys = @expressions.keys
-			return INVALID_INDEX unless stack.last.to_i32 < keys.size && stack.last.to_i32 >= 0
+			return INVALID_INDEX unless stack.last.to_i64 < keys.size && stack.last.to_i64 >= 0
 			consume 1
-			@expressions.delete(keys[a.to_i32])
+			@expressions.delete(keys[a.to_i64])
 			@input_queue.insert(0, "expri")
 		elsif @op.starts_with?("repeat_") && len(1)
 			consume 1
 			repeat_expr = @op.split("repeat_").last
-			a.to_i32.times do 
+			a.to_i64.times do 
 				@input_queue.insert(0, repeat_expr)
 			end
 		elsif @op.starts_with?("doif_") && len(1)
@@ -242,7 +242,7 @@ class RPNCalc
 		stack.size >= num_elements
 	end
 	def qtty
-		stack.last.to_i32 + 1
+		stack.last.to_i64 + 1
 	end
 	def a
 		@auxArr[0]
