@@ -1,4 +1,5 @@
 require "string_pool"
+# build with: crystal build --release rpncalc.cr
 
 class Array(T)
 	def <<(arr : Array(T)) : Array(T)
