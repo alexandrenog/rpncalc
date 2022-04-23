@@ -13,6 +13,7 @@ end
 
 macro backup_from_error
 	@stack = backupArr
+  @input_queue.clear
 end
 class RPNCalc
 	INVALID_ARGUMENT = "Error: Invalid argument"
