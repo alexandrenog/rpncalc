@@ -134,7 +134,7 @@ class RPNCalc
 		elsif check "randi", 1
 			consume 1
 			vi = a.to_i32
-			stack << Random.rand(vi > 0 ? vi : 1) 
+			stack << Random.rand(vi > 0 ? vi : 1).to_f64
 		elsif check "sum", 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
