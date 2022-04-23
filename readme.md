@@ -6,15 +6,17 @@ A Reverse Polish Notation Calculator, with expression/macro functionality.
 
 Operators:
 
-Math: [+] [-] [*] [/] [**|pow] sq sqrt opo inv sum mult max min \
-Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap] \
-Qtty of numbers in the line since the last comma: [,]  Stack size: [.|qtt|qtty] \
-Create Expression: { \<w1> \<w2> \<w3> ... } \<name>   List Expressions: expr \
-Repeat \<w1> N times: repeat_\<w1> \
-Execute \<w1> or \<w2> conditionally: doif_\<w1>_\<w2> \
-Exit: [exit|out] \
-Help: [help|cmds] \
-
+Math: [+] [-] [*] [/] [**|pow] sq sqrt opo inv sum mult max min rand(0~1) randi(0 to \<N-1>) \
+Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]  \
+Qtty of numbers in the line until the comma: [,]   \
+Stack size: [.|qtt|qtty]  
+Create Expression: { \<w1> \<w2> \<w3> ... } \<name>  
+List Expressions: expr or expri(for indexes) \
+Delete Expression: \<N> delxpr  \
+Repeat \<w1> N times: repeat_\<w1>  
+Execute \<w1> or \<w2> conditionally: doif_\<w1>_\<w2>   
+Help: [help|cmds]   
+Exit: [exit|out] 
 
 There are two programming Operators: repeat_\<value1> and doif_\<value1>_\<value2>
   
