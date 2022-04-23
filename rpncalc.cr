@@ -253,8 +253,8 @@ class RPNCalc
 		@auxArr
 	end
 	def apply_expression(expression)
-		expression.size.times do |idx|
-			@input_queue.insert(idx, expression[idx])
+		expression.each_with_index do |word,idx|
+			@input_queue.insert(idx, word)
 		end
 	end
 	def read_input()
