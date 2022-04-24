@@ -1,5 +1,7 @@
 require "string_pool"
 
+#crystal build --release rpncalc.cr
+
 class Array(T)
 	def <<(arr : Array(T)) : Array(T)
 		self.concat(arr)
