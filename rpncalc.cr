@@ -1,5 +1,4 @@
 require "string_pool"
-# build with: crystal build --release rpncalc.cr
 
 class Array(T)
 	def <<(arr : Array(T)) : Array(T)
@@ -22,7 +21,7 @@ class RPNCalc
 	ZERO_DIVISION = "Error: Can't divide by 0"
 	property stack, operations
 	def initialize
-		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto pop sum mult del deln , . qtt qtty opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi)
+		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto pop sum mult del deln , . qtt qtty opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi prtqueue prtstack)
 		@operations_string = "Math: [+] [-] [*] [/] [**|pow] sq sqrt opo inv sum mult max min rand(0~1) randi(0 to <N-1>)            Help: [help|cmds]\n"
 		@operations_string+= "Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]                                 Exit: [exit|out] \n"
 		@operations_string+= "Qtty of numbers in the line until the comma: [,]   Stack size: [.|qtt|qtty]\n"
@@ -94,7 +93,7 @@ class RPNCalc
 					@numbers_in_line = 0 #executed with success
 				end
 			end
-			puts "[#{stack.map{|n| n % 1 == 0 ? n.to_i64.to_s : n.to_s}.join(" ")}>"
+			printStack
 		end	
 	end
 	def execute (@op : String) : String | Nil
@@ -189,6 +188,10 @@ class RPNCalc
 			stack << @numbers_in_line.to_f64
 		elsif check ["help","cmds"]
 			puts @operations_string
+		elsif check "prtqueue"
+			puts  "queue[#{@input_queue.join(" ")}]"
+		elsif check "prtstack"
+			printStack
 		elsif check ["exit","out"]
 			exit
 		elsif check "expr"
@@ -265,6 +268,9 @@ class RPNCalc
 	def prompt(str)
 		print str
 		return gets.not_nil!.chomp.gsub('{', " { ").gsub('}', " } ")    
+	end
+	def printStack
+		puts "[#{stack.map{|n| n % 1 == 0 ? n.to_i64.to_s : n.to_s}.join(" ")}>"
 	end
 end
 
