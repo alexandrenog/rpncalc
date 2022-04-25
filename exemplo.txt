@@ -1,0 +1,28 @@
+{ keepHead newCounter loopA } calculateShots
+{ 0 swap } newCounter
+{ . cpyto . 1 - deln } keepHead
+{ spend stillHas doif_loopA_pop } loopA
+{ swap 1 + swap decrementRandom } spend
+{ probality doif_decrement } decrementRandom
+{ 10 randi 8 - } probality
+{ 1 - } decrement
+{ dup } stillHas
+
+
+
+{. cpyto . 1 - deln 0 swap loopA} calculateShots
+{swap 1 + swap 10 randi 8 - doif_dec dup doif_loopA_pop} loopA 
+{1 -} dec
+
+
+<some_value> calculateShots
+
+int q = <some_value>;
+int c = 0;
+while(q>0){
+	c=c+1
+	if(rand()%10-8>0){
+		q=q-1;
+	}
+}
+print(c)

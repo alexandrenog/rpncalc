@@ -1,0 +1,1 @@
+crystal build --release rpncalc.cr
