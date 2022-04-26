@@ -1,27 +1,28 @@
+EXPRESSOES DE CRIAÇÃO, ACESSO E MODIFICAO DAS 3 VARIAVEIS
+
 {dup 1 + del 1 - cpyto} rcv
-{1 +}inc
 
-{.} refSize
-{ . refSize cpyto } initSize
+{ . . cpyto } initSize
 { . cpy } size
-{ refSize rcv } size=
+{ . rcv } size=
 
-{. 1 -} refI
-{ 0 refI cpyto } initI
-{ refI cpy } i
-{ refI  rcv } i=
+{ 0 . 1 - cpyto } initI
+{ . 1 - cpy } i
+{ . 1 - rcv } i=
 
-{. 2 -} refSwapped
-{ 0 refSwapped cpyto } initSwapped
-{ refSwapped cpy } swapped
-{ refSwapped  rcv } swapped=
+{ 0 . 2 - cpyto } initSwapped
+{ . 2 - cpy } swapped
+{ . 2 - rcv } swapped=
+
+
+VERSÃO LEGIVEL DO ALGORITMO:
 
 {initSize initI initSwapped}initVars
 {3 repeat_dllast}deleteVars
 {. del}dllast
+{1 +}inc
 
-
-{ initVars loopA deleteVars} sort
+{ initVars loopA deleteVars} bubbleSort
 { 0 swapped= 0 i= loopB swapped doif_loopA}loopA
 { size i - } condA
 { i inc i= }incI
@@ -29,16 +30,22 @@
 { i cpy i 2 + cpy -}condB
 { i cpy i inc del i inc cpyto 1 swapped=}blockA
 
-{repeat_rnd}rndArr {10000 randi}rnd
-{repeat_rndF}rndArrF {10000 rand * }rndF
+VERSÃO ALGUTINADA DO ALGORITMO:
 
-400 rndArr
-sort
-
-
-
-{ . . cpyto 0 . 1 - cpyto 0 . 2 - cpyto loopA . del . del . del} sort
+{ . . cpyto 0 . 1 - cpyto 0 . 2 - cpyto loopA . del . del . del} bubbleSort
 { 0 . 2 -  dup 1 + del 1 - cpyto 0 . 1 -  dup 1 + del 1 - cpyto loopB . 2 - cpy doif_loopA}loopA
 { . 1 - cpy cpy . 1 - cpy 2 + cpy - doif_blockA . 1 - cpy 1 + . 1 -  dup 1 + del 1 - cpyto . cpy . 1 - cpy - doif_loopB}loopB
 { . 1 - cpy cpy . 1 - cpy 1 + del . 1 - cpy 1 + cpyto 1 . 2 -  dup 1 + del 1 - cpyto}blockA
+
+GERAR LISTA ALEATORIA DE INTEIROS
+{repeat_rnd}randArr {10000 randi}rnd
+
+GERAR LISTA ALEATORIA DE DECIMAIS
+{repeat_rndF}randArrF {10000 rand * }rndF
+
+EXEMPLO TESTE
+500 randArr
+bubbleSort
+
+
 
