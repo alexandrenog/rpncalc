@@ -17,41 +17,41 @@ macro backup_from_error
 end
 
 enum Operator
-	Sum					#    1 2 -> 3
-	SumN				#    20 12 17 3 -> 49
-	Sub					#	 1 2 -> -1
-	Mult				#    10 2 -> 20
-	MultN				#    4 10 7 3 -> 280
-	Div					#    10 2 -> 5
-	Pow					#    2 3 -> 8
-	Sq					#    2 -> 4
-	Sqrt				#    4 -> 2
-	Inv					#    2 -> 0.5
-	Clear				#    4 10 7 -> 
-	Swap				#	 1 2 -> 2 1
-	Dup					#    1 -> 1 1
-	Copy				#    80 19 53 123 4 -> 80 19 53 123 80
-	CopyN				#	 80 19 53 123 4 -> 80 19 53 123 80 19 53 123
-	CopyTo				#    80 19 53 123 3 -> 123 80 19 53  # consumes the number, not just the index, it's actually a move operation
-	Pop					#	 1 2 -> 1
-	Del					#	 80 19 53 123 2 -> 80 19 123
-	DelN				#	 80 19 53 123 2 -> 80 19 
-	CurrQtty			#    
-	StackQtty			#    80 19 53 123 -> 80 19 53 123 4
-	Opposite			#    1 -> -1
-	Max					#`   80 19 53 123 4 -> 123
-	Min					#    80 19 53 123 4 -> 19
-	ListExpr			#	 
-	ListExprIdx			#
-	DelExpr				#
-	Exit				#
-	RandF				#	
-	RandI				#
-	PrintQueue			#
-	PrintStack			#
-	Help				#
-	BracketBegin		#
-	BracketEnd			#
+	Sum                             #    1 2 -> 3
+	SumN                            #    20 12 17 3 -> 49
+	Sub                             #    1 2 -> -1
+	Mult                            #    10 2 -> 20
+	MultN                           #    4 10 7 3 -> 280
+	Div                             #    10 2 -> 5
+	Pow                             #    2 3 -> 8
+	Sq                              #    2 -> 4
+	Sqrt                            #    4 -> 2
+	Inv                             #    2 -> 0.5
+	Clear                           #    4 10 7 -> 
+	Swap                            #    1 2 -> 2 1
+	Dup                             #    1 -> 1 1
+	Copy                            #    80 19 53 123 4 -> 80 19 53 123 80
+	CopyN                           #    80 19 53 123 4 -> 80 19 53 123 80 19 53 123
+	CopyTo                          #    80 19 53 123 3 -> 123 80 19 53  # consumes the number, not just the index, it's actually a move operation
+	Pop                             #    1 2 -> 1
+	Del                             #    80 19 53 123 2 -> 80 19 123
+	DelN                            #    80 19 53 123 2 -> 80 19 
+	CurrQtty    
+	StackQtty                       #    80 19 53 123 -> 80 19 53 123 4
+	Opposite                        #    1 -> -1
+	Max                             #    80 19 53 123 4 -> 123
+	Min                             #    80 19 53 123 4 -> 19
+	ListExpr	 
+	ListExprIdx
+	DelExpr 
+	Exit 
+	RandF	
+	RandI 
+	PrintQueue
+	PrintStack
+	Help
+	BracketBegin
+	BracketEnd
 	def to_s(io)
 		io.puts(self.to_s)
 	end
