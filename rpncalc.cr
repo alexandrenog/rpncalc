@@ -448,38 +448,37 @@ class RPNCalc
 		w.is_a?(Operator) ? @operations_dict[w.to_i] : (w.is_a?(Float64) ? formatNumber(w) : ( w.is_a?(ControlType) ? formatControl(w) : w ))
 	end
 	def stringToWord(str : String) : Word | Nil
-		if op = Operator.from_string(str)
-			op
-		elsif number = str.to_f64?
-			number
-		elsif control = Control.from_string(str)
-			if control == Control::Repeat
-				str = str.split("repeat_").last
-				if firstWd = stringToWordExceptControl(str)
-					{control,firstWd, nil}
-				end
-			else 
-				wds = str.split("_")
-				wds.shift
-				if firstWd = stringToWordExceptControl(wds[0])
-					if wds.size == 2
-						if secondWd = stringToWordExceptControl(wds[1])
-							{control,firstWd, secondWd}
-						else
-							{control,firstWd, nil}
-						end
-					else
-						{control,firstWd, nil}
-					end
-				end
-			end
-		elsif str.is_a?(ExpressionName) 
-			str
+		if control = Control.from_string(str)
+			stringToControlWord(str, control)
+		elsif word = stringToSimpleWord(str)
+			word
 		else
 			raise "Invalid word: #{str}"
 		end
 	end
-	def stringToWordExceptControl(str : String) : SimpleWord | Nil
+	def stringToControlWord(str : String, control : Control) : ControlType | Nil
+		if control == Control::Repeat
+			str = str.split("repeat_").last
+			if firstWd = stringToSimpleWord(str)
+				{control,firstWd, nil}
+			end
+		else 
+			wds = str.split("_")
+			wds.shift
+			if firstWd = stringToSimpleWord(wds[0])
+				if wds.size == 2
+					if secondWd = stringToSimpleWord(wds[1])
+						{control,firstWd, secondWd}
+					else
+						{control,firstWd, nil}
+					end
+				else
+					{control,firstWd, nil}
+				end
+			end
+		end
+	end
+	def stringToSimpleWord(str : String) : SimpleWord | Nil
 		if op = Operator.from_string(str)
 			op
 		elsif number = str.to_f64?
