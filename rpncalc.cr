@@ -16,6 +16,15 @@ macro backup_from_error
 	@input_queue.clear
 end
 
+macro addFromTwo (num)
+	consume 2
+	stack << {{num}}
+end
+macro addFromOne (num)
+	consume 1
+	stack << {{num}}
+end
+
 enum Operator
 	Sum                             #    1 2 -> 3
 	SumN                            #    20 12 17 3 -> 49
@@ -272,33 +281,25 @@ class RPNCalc
 	def execute (@op : Operator) : String | Nil
 
 		if check Operator::Sum, 2 
-			consume 2
-			stack << a + b
+			addFromTwo a + b
 		elsif check Operator::Sub, 2
-			consume 2
-			stack << a - b
+			addFromTwo a - b 
 		elsif check Operator::Mult, 2 
-			consume 2
-			stack << a * b
+			addFromTwo a * b
 		elsif check Operator::Pow, 2 
-			consume 2
-			stack << a ** b
+			addFromTwo a ** b
 		elsif check Operator::Div, 2 
 			consume 2
 			return ZERO_DIVISION if b == 0
 			stack << a / b
 		elsif check Operator::Swap, 2 
-			consume 2
-			stack << b << a
+			addFromTwo b << a
 		elsif check Operator::Sq, 1
-			consume 1
-			stack << a ** 2.0
+			addFromOne a ** 2.0
 		elsif check Operator::Sqrt, 1
-			consume 1
-			stack << a ** 0.5
+			addFromOne a ** 0.5
 		elsif check Operator::Opposite, 1
-			consume 1
-			stack << - a
+			addFromOne -a
 		elsif check Operator::Inv, 1
 			consume 1
 			return ZERO_DIVISION if a == 0
