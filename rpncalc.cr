@@ -271,112 +271,112 @@ class RPNCalc
 	end
 	def execute (@op : Operator) : String | Nil
 
-		if check "+", 2 
+		if check Operator::Sum, 2 
 			consume 2
 			stack << a + b
-		elsif check "-", 2
+		elsif check Operator::Sub, 2
 			consume 2
 			stack << a - b
-		elsif check "*", 2 
+		elsif check Operator::Mult, 2 
 			consume 2
 			stack << a * b
-		elsif check ["**", "pow"], 2 
+		elsif check Operator::Pow, 2 
 			consume 2
 			stack << a ** b
-		elsif check "/", 2 
+		elsif check Operator::Div, 2 
 			consume 2
 			return ZERO_DIVISION if b == 0
 			stack << a / b
-		elsif check ["swp", "swap"], 2 
+		elsif check Operator::Swap, 2 
 			consume 2
 			stack << b << a
-		elsif check "sq", 1
+		elsif check Operator::Sq, 1
 			consume 1
 			stack << a ** 2.0
-		elsif check "sqrt", 1
+		elsif check Operator::Sqrt, 1
 			consume 1
 			stack << a ** 0.5
-		elsif check ["neg","opo"], 1
+		elsif check Operator::Opposite, 1
 			consume 1
 			stack << - a
-		elsif check "inv", 1
+		elsif check Operator::Inv, 1
 			consume 1
 			return ZERO_DIVISION if a == 0
 			stack << 1.0 / a
-		elsif check "rand"
+		elsif check Operator::RandF
 			stack << Random.rand
-		elsif check "randi", 1
+		elsif check Operator::RandI, 1
 			consume 1
 			vi = a.to_i64
 			stack << Random.rand(vi > 0 ? vi : 1).to_f64
-		elsif check "sum", 1 
+		elsif check Operator::SumN, 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
 			stack << numbers.reduce(0.0.to_f64){|acc, el| el+acc} 
-		elsif check "mult", 1 
+		elsif check Operator::MultN, 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
 			stack << numbers.reduce(1.0.to_f64){|acc, el| el*acc} 
-		elsif check "max", 1 
+		elsif check Operator::Max, 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
 			stack << numbers.max 
-		elsif check "min", 1 
+		elsif check Operator::Min, 1 
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
 			stack << numbers.min
-		elsif check ["clr", "clear"]
+		elsif check Operator::Clear
 			stack.clear
-		elsif check "del", 1
+		elsif check Operator::Del, 1
 			return INVALID_INDEX unless len(qtty) || qtty<=1
 			stack.delete_at(stack.size-qtty) 
 			stack.pop
-		elsif check "deln", 1
+		elsif check Operator::DelN, 1
 			return INVALID_ARGUMENT unless len(qtty)
 			stack.pop qtty
-		elsif check "pop"
+		elsif check Operator::Pop
 			stack.pop
-		elsif check "dup", 1
+		elsif check Operator::Dup, 1
 			stack << stack.last
-		elsif check "cpy", 1
+		elsif check Operator::Copy, 1
 			if len(qtty)
 			 stack[-1] = stack[-(qtty)]
 			else
 				return INVALID_INDEX 
 	 		end
-		elsif check "cpyn", 1
+		elsif check Operator::CopyN, 1
 			return INVALID_ARGUMENT unless len(qtty)
 			consume_pop qtty
 			stack << numbers.map(&.dup) << numbers.map(&.dup)
-		elsif check "cpyto", 2
+		elsif check Operator::CopyTo, 2
 			consume 2
 			if len(b-1)
 			  	stack.insert(-(b.to_i64), a)
 			else
 				return INVALID_INDEX 
 	 		end
-		elsif check [".", "qtty", "qtt"]
+		elsif check Operator::StackQtty
 			stack << stack.size.to_f64
-		elsif check [","]
+		elsif check Operator::CurrQtty
 			stack << @numbers_in_line.to_f64
-		elsif check ["help","cmds"]
+		elsif check Operator::Help
 			puts @operations_string
-		elsif check "prtqueue"
+		elsif check Operator::PrintQueue
 			puts  "queue[#{@input_queue.join(" ")}]"
-		elsif check "prtstack"
+		elsif check Operator::PrintStack
 			printStack
-		elsif check ["exit","out"]
+		elsif check Operator::Exit
 			exit
-		elsif check "expr"
+		elsif check Operator::ListExpr
 			@expressions.each do |name,words|
 				puts "{ #{words.map{|w| formatWord(w) }.join(" ")} } #{name}"
 			end
-		elsif check "expri"
+		elsif check Operator::ListExprIdx
 			@expressions.keys.each_with_index do |name,idx|
 				words = @expressions[name]
 				puts "#{idx}: { #{words.map{|w| formatWord(w) }.join(" ")} } #{name}"
 			end
-		elsif check "delxpr", 1
+		elsif check Operator::DelExpr, 1
 			keys = @expressions.keys
 			return INVALID_INDEX unless stack.last.to_i64 < keys.size && stack.last.to_i64 >= 0
 			consume 1
@@ -395,11 +395,8 @@ class RPNCalc
 		consume(operands)
 		@auxArr.pop # remove tail, usually argument
 	end
-	def check (operatorsStr : Array(String), operands = 0)
-		len(operands) && operatorsStr.map{|operatorStr| Operator.from_string(operatorStr) == @op}.any?
-	end
-	def check (operatorStr : String, operands = 0)
-		check([operatorStr], operands)
+	def check (operator : Operator, operands = 0)
+		len(operands) && @op == operator
 	end
 	def len (num_elements)
 		stack.size >= num_elements
