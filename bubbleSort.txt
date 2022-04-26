@@ -30,7 +30,7 @@ VERSÃO LEGIVEL DO ALGORITMO:
 { i cpy i 2 + cpy -}condB
 { i cpy i inc del i inc cpyto 1 swapped=}blockA
 
-VERSÃO ALGUTINADA DO ALGORITMO:
+VERSÃO ALGUTINADA DO ALGORITMO (melhora bem levemente o desempenho):
 
 { . . cpyto 0 . 1 - cpyto 0 . 2 - cpyto loopA . del . del . del} bubbleSort
 { 0 . 2 -  dup 1 + del 1 - cpyto 0 . 1 -  dup 1 + del 1 - cpyto loopB . 2 - cpy doif_loopA}loopA
