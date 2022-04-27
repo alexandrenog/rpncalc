@@ -23,7 +23,7 @@ There are two programming Operators: repeat_\<value1> and doif_\<value1>_\<value
 Values can be Numeric Values, Operators, or Expressions
   
 repeat_value1 consumes the last value as a quantity N  \
-And apply value1 N times in the stack  \
+And apply value1 N times in the stack   \
   
 doif_value1_value2 consumes the last value as a condition  \
 Any positive number is considered true, otherwise it is considered false  \
