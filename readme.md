@@ -22,19 +22,8 @@ There are two programming Operators: repeat_\<value1> and doif_\<value1>_\<value
   
 Values can be Numeric Values, Operators, or Expressions
   
-Usage of repeat:  \
-[] |  5 repeat_1 \
-[1 1 1 1 1] | 2 repeat_+  \
-[1 1 3] 
-  
 repeat_value1 consumes the last value as a quantity N  \
 And apply value1 N times in the stack  \
-Usage of doif:  \
-[3 4 1] | doif\_+\_*  \
-[7] | 8 -1 doif\_+\_*  \
-[56] | 2 0 doif\_+\_*  \
-[112] | 9 doif_dup  \
-[112 112]
   
 doif_value1_value2 consumes the last value as a condition  \
 Any positive number is considered true, otherwise it is considered false  \
