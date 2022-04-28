@@ -462,8 +462,15 @@ class RPNCalc
 		end
 		return str
 	end
+  def formatExpressionId (id : ExpressionId) : String
+    if expression = @expressions[id]
+      expression[0]
+    else
+      "<deleted_expression>"
+    end
+  end
 	def formatWord(w : Word) : String
-		w.is_a?(Operator) ? @operations_dict[w.to_i] : (w.is_a?(Float64) ? formatNumber(w) : ( w.is_a?(ControlType) ? formatControl(w) : (w.is_a?(ExpressionId) ? w.to_s : w ) ))
+w.is_a?(Operator) ? @operations_dict[w.to_i] : (w.is_a?(Float64) ? formatNumber(w) : ( w.is_a?(ControlType) ? formatControl(w) : (w.is_a?(ExpressionId) ? formatExpressionId(w) : w ) ))
 	end
 	def stringToWord(str : String) : Word | Nil
 		if control = Control.from_string(str)
