@@ -1,1 +1,1 @@
-crystal build --release rpncalc.cr
+crystal build --release --no-debug --progress rpncalc.cr
