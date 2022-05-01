@@ -161,9 +161,7 @@ class RPNCalc
 	ZERO_DIVISION = "Error: Can't divide by 0"
 	MAX_DECIMAL_PLACES = 8
 	alias ExpressionName = String
-	alias ExpressionId = Int32
-  alias Expression = Tuple(ExpressionName,Array(Word))
-	alias SimpleWord = Operator | ExpressionId | ExpressionName | Float64
+	alias SimpleWord = Operator | ExpressionName | Float64
 	alias ControlType = Tuple(Control, SimpleWord, SimpleWord | Nil)
 	alias Word = SimpleWord | ControlType
 	property stack, operations
@@ -180,8 +178,8 @@ class RPNCalc
 		@op = ""
 		@numbers_in_line = 0
 		@reading_expression = false
-		@newExpressionWords = [] of Word
-		@expressions = Array(Expression|Nil).new
+		@expression = [] of Word
+		@expressions = Hash(ExpressionName,Array(Word)).new
 		@input_queue = Deque(Word).new
 	end
 	def start
@@ -209,24 +207,18 @@ class RPNCalc
 						next
 					end
 					unless(word == Operator::BracketEnd)
-						@newExpressionWords << word
+						@expression << word
 					else
 						@reading_expression = false
 					end
 					next
 				end
-				if(!@reading_expression && !@newExpressionWords.empty?)
-					unless word.is_a?(Operator) || word.is_a?(Float64)
-						unless @newExpressionWords.includes?(word)
-							if word.is_a?(ExpressionName)
-                if index = @expressions.index{|ex| matchExpressionName(ex, word)}
-                  @expressions[index] = {word, @newExpressionWords}
-                  updateExpressionRefs(word,index)
-                else
-                  @expressions << {word, @newExpressionWords}
-                  updateExpressionRefs(word)
-                end
-								@newExpressionWords = [] of Word
+				if(!@reading_expression && !@expression.empty?)
+					unless( word.is_a?(Operator) || word.is_a?(Float64))
+						unless @expression.includes?(word)
+							if(word.is_a?(ExpressionName))
+								@expressions[word] = @expression
+								@expression = [] of Word
 							end
 						else
 							puts "Error: Circular reference"
@@ -274,19 +266,13 @@ class RPNCalc
 					else
 						@numbers_in_line = 0 #executed with success
 					end
-				elsif word.is_a?(ExpressionId)
+				elsif word.is_a?(ExpressionName)
 					if expression = @expressions[word]?
-						apply_expression(expression)
-          end
-        elsif word.is_a?(ExpressionName) 
-          if index = @expressions.index{|ex| matchExpressionName(ex,word)}
-            if expression = @expressions[index]?
-  						apply_expression(expression)
-            end
-          else
-            puts "Error: Invalid expression \"#{word}\""
-            backup_from_error 
-          end
+						apply_expression(expression) 
+					elsif word != ""
+						puts "Error: Invalid expression \"#{word}\""
+						backup_from_error 
+					end
 				end
 			end
 			printStack
@@ -383,23 +369,19 @@ class RPNCalc
 		elsif check Operator::Exit
 			exit
 		elsif check Operator::ListExpr
-			@expressions.each do |expression|
-        if expression
-          name, words = expression[0], expression[1]
-				  puts "{ #{words.map{|w| formatWord(w) }.join(" ")} } #{name}"
-        end
+			@expressions.each do |name,words|
+				puts "{ #{words.map{|w| formatWord(w) }.join(" ")} } #{name}"
 			end
 		elsif check Operator::ListExprIdx
-			@expressions.each_with_index do |expression,idx|
-        if expression
-          name, words = expression[0], expression[1]
-			  	puts "#{idx}: { #{words.map{|w| formatWord(w) }.join(" ")} } #{name}"
-        end
+			@expressions.keys.each_with_index do |name,idx|
+				words = @expressions[name]
+				puts "#{idx}: { #{words.map{|w| formatWord(w) }.join(" ")} } #{name}"
 			end
 		elsif check Operator::DelExpr, 1
-			return INVALID_INDEX unless stack.last.to_i64 < @expressions.size && stack.last.to_i64 >= 0
+			keys = @expressions.keys
+			return INVALID_INDEX unless stack.last.to_i64 < keys.size && stack.last.to_i64 >= 0
 			consume 1
-      @expressions[a.to_i64]=nil
+			@expressions.delete(keys[a.to_i64])
 			@input_queue.insert(0, Operator::ListExprIdx)
 		else
 			return "Error: Not enough arguments for #{@op}."
@@ -433,7 +415,7 @@ class RPNCalc
 		@auxArr
 	end
 	def apply_expression(expression)
-    expression[1].each_with_index do |word,idx|
+		expression.each_with_index do |word,idx|
 			@input_queue.insert(idx, word)
 		end
 	end
@@ -462,15 +444,8 @@ class RPNCalc
 		end
 		return str
 	end
-  def formatExpressionId (id : ExpressionId) : String
-    if expression = @expressions[id]
-      expression[0]
-    else
-      "<deleted_expression>"
-    end
-  end
 	def formatWord(w : Word) : String
-w.is_a?(Operator) ? @operations_dict[w.to_i] : (w.is_a?(Float64) ? formatNumber(w) : ( w.is_a?(ControlType) ? formatControl(w) : (w.is_a?(ExpressionId) ? formatExpressionId(w) : w ) ))
+		w.is_a?(Operator) ? @operations_dict[w.to_i] : (w.is_a?(Float64) ? formatNumber(w) : ( w.is_a?(ControlType) ? formatControl(w) : w ))
 	end
 	def stringToWord(str : String) : Word | Nil
 		if control = Control.from_string(str)
@@ -503,35 +478,17 @@ w.is_a?(Operator) ? @operations_dict[w.to_i] : (w.is_a?(Float64) ? formatNumber(
 			end
 		end
 	end
-	def stringToSimpleWord(str : String) : SimpleWord
+	def stringToSimpleWord(str : String) : SimpleWord | Nil
 		if op = Operator.from_string(str)
 			op
 		elsif number = str.to_f64?
 			number
-		elsif expressionId = @expressions.index { |ex| matchExpressionName(ex, str) }
-			expressionId
-		else
+		elsif str.is_a?(ExpressionName)
 			str
+		else
+			nil
 		end
 	end
-  def matchExpressionName(expression : Expression | Nil, str : String) : Bool
-     if expression
-        expression[0] == str
-      else
-        false
-      end
-  end
-  def updateExpressionRefs(expressionName : ExpressionName, id : ExpressionId = @expressions.size-1)
-    @expressions.size.times do |index|
-      if expression = @expressions[index]
-          name, words = expression[0], expression[1]
-          if words.includes?(expressionName)
-            newWords = words.map{|word| (word==expressionName)? id : word}
-            @expressions[index] = {name, newWords}
-          end
-      end
-    end
-  end
 end
 
 
