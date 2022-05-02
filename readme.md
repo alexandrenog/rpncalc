@@ -32,7 +32,6 @@ _value2 is optional  </br>
 _value1 can be omited with a doif__value2
   
 <h2> Definining expressions example:  </h2>
-  { 2 * } double </br>
-  [5] | double  </br>
-  [10] | 8 + double  </br>
-  [36]
+  Type "{ 2 * } double" to define the "double" expression</br>
+  With the stack "[5]", typing "double" results in "[10]" </br>
+  With the stack "[10]", typing "8 + double" results in "[36]" </br>
