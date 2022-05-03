@@ -6,7 +6,7 @@ A Reverse Polish Notation Calculator, with expression/macro functionality.
 
 Operators:
 
-Math: [+] [-] [*] [/] [**|pow] [%|mod] sq sqrt opo inv floor ceil sum mult max min rand(0~1) randi(0 to \<N-1>) \
+Math: [+] [-] [*] [/] [**|pow] sq sqrt opo inv sum mult max min rand(0~1) randi(0 to \<N-1>) \
 Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]  \
 Qtty of numbers in the line until the comma: [,]   \
 Stack size: [.|qtt|qtty]  
