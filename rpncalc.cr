@@ -61,9 +61,9 @@ enum Operator
 	Help
 	BracketBegin
 	BracketEnd
-	def to_s(io)
-		io.puts(self.to_s)
-	end
+	Floor                          #   1.5 -> 1
+	Ceil                           #   1.5 -> 2
+	Mod                            #   10 2 -> 0, 11 2 -> 1, 20 7 -> 6
 	def self.from_string(value)
 		case value
 		when "+"
@@ -136,6 +136,12 @@ enum Operator
 			BracketBegin
 		when "}"
 			BracketEnd
+		when "floor"
+			Floor
+		when "ceil"
+			Ceil
+		when "mod", "%"
+			Mod
 		else
 			nil
 		end
@@ -166,13 +172,15 @@ class RPNCalc
 	alias Word = SimpleWord | ControlType
 	property stack, operations
 	def initialize
-		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto pop sum mult del deln , . qtt qtty neg opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi prtqueue prtstack)
-		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack help { } )
-		@operations_string = "Math: [+] [-] [*] [/] [**|pow] sq sqrt [neg|opo] inv sum mult max min rand(0~1) randi(0 to <N-1>)            Help: [help|cmds]\n"
-		@operations_string+= "Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]                                 Exit: [exit|out] \n"
+		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto pop sum mult del deln , . qtt qtty neg opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi prtqueue prtstack floor ceil %)
+		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack help { } floor ceil %)
+		@operations_string = "Math: [+] [-] [*] [/] [**|pow] [%|mod] sq sqrt [neg|opo] inv floor ceil sum mult max min rand(0~1) randi(0 to <N-1>)\n"
+		@operations_string+= "Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]\n"
 		@operations_string+= "Qtty of numbers in the line until the comma: [,]   Stack size: [.|qtt|qtty]\n"
 		@operations_string+= "Create Expression: { <w1> <w2> <w3> ... } <name>   List Expressions: expr or expri(for indexes)\nDelete Expression: <N> delxpr\n"
 		@operations_string+= "Repeat <w1> N times: repeat_<w1>    Execute <w1> or <w2> conditionally: doif_<w1>_<w2>\n"
+		@operations_string+= "Help: [help|cmds]\n"
+		@operations_string+= "Exit: [exit|out] \n"
 		@stack = Array(Float64).new
 		@auxArr = Array(Float64).new
 		@op = ""
@@ -292,6 +300,10 @@ class RPNCalc
 			consume 2
 			return ZERO_DIVISION if b == 0
 			stack << a / b
+		elsif check Operator::Mod, 2 
+			consume 2
+			return ZERO_DIVISION if b == 0
+			stack << a % b
 		elsif check Operator::Swap, 2 
 			addFromTwo b << a
 		elsif check Operator::Sq, 1
@@ -300,6 +312,10 @@ class RPNCalc
 			addFromOne a ** 0.5
 		elsif check Operator::Opposite, 1
 			addFromOne -a
+		elsif check Operator::Floor, 1
+			addFromOne a.floor
+		elsif check Operator::Ceil, 1
+			addFromOne a.ceil
 		elsif check Operator::Inv, 1
 			consume 1
 			return ZERO_DIVISION if a == 0
