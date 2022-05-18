@@ -41,7 +41,8 @@ enum Operator
 	Dup                             #    1 -> 1 1
 	Copy                            #    80 19 53 123 4 -> 80 19 53 123 80
 	CopyN                           #    80 19 53 123 4 -> 80 19 53 123 80 19 53 123
-	CopyTo                          #    80 19 53 123 3 -> 123 80 19 53  # consumes the number, not just the index, it's actually a move operation
+	CopyTo                          #    80 19 53 123 3 -> 123 80 19 53 123 
+	MoveTo                          #    80 19 53 123 3 -> 123 80 19 53  
 	Pop                             #    1 2 -> 1
 	Del                             #    80 19 53 123 2 -> 80 19 123
 	DelN                            #    80 19 53 123 2 -> 80 19 
@@ -98,6 +99,8 @@ enum Operator
 			CopyN
 		when "cpyto"
 			CopyTo
+		when "mvto", "mov"
+			MoveTo
 		when "pop"
 			Pop
 		when "del"
@@ -172,10 +175,10 @@ class RPNCalc
 	alias Word = SimpleWord | ControlType
 	property stack, operations
 	def initialize
-		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto pop sum mult del deln , . qtt qtty neg opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi prtqueue prtstack floor ceil %)
-		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack help { } floor ceil %)
+		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto mvto mov pop sum mult del deln , . qtt qtty neg opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi prtqueue prtstack floor ceil %)
+		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto mvto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack help { } floor ceil %)
 		@operations_string = "Math: [+] [-] [*] [/] [**|pow] [%|mod] sq sqrt [neg|opo] inv floor ceil sum mult max min rand(0~1) randi(0 to <N-1>)\n"
-		@operations_string+= "Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]\n"
+		@operations_string+= "Stack Handling: dup cpy cpyn cpyto [mov|mvto] pop del deln [clr|clear] [swp|swap]\n"
 		@operations_string+= "Qtty of numbers in the line until the comma: [,]   Stack size: [.|qtt|qtty]\n"
 		@operations_string+= "Create Expression: { <w1> <w2> <w3> ... } <name>   List Expressions: expr or expri(for indexes)\nDelete Expression: <N> delxpr\n"
 		@operations_string+= "Repeat <w1> N times: repeat_<w1>    Execute <w1> or <w2> conditionally: doif_<w1>_<w2>\n"
@@ -366,6 +369,14 @@ class RPNCalc
 			consume_pop qtty
 			stack << numbers.map(&.dup) << numbers.map(&.dup)
 		elsif check Operator::CopyTo, 2
+			consume 2
+			if len(b-1)
+			  	stack.insert(-(b.to_i64), a)
+				stack << a
+			else
+				return INVALID_INDEX 
+	 		end
+		elsif check Operator::MoveTo, 2
 			consume 2
 			if len(b-1)
 			  	stack.insert(-(b.to_i64), a)

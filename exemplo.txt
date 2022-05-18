@@ -1,6 +1,6 @@
 { keepHead newCounter loopA } calculateShots
 { 0 swap } newCounter
-{ . cpyto . 1 - deln } keepHead
+{ . mvto . 1 - deln } keepHead
 { spend stillHas doif_loopA_pop } loopA
 { swap 1 + swap decrementRandom } spend
 { probality doif_decrement } decrementRandom
@@ -10,7 +10,7 @@
 
 
 
-{. cpyto . 1 - deln 0 swap loopA} calculateShots
+{. mvto . 1 - deln 0 swap loopA} calculateShots
 {swap 1 + swap 10 randi 8 - doif_dec dup doif_loopA_pop} loopA 
 {1 -} dec
 

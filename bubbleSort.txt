@@ -1,18 +1,21 @@
 EXPRESSOES DE CRIAÇÃO, ACESSO E MODIFICAO DAS 3 VARIAVEIS
 
-{dup 1 + del 1 - cpyto} rcv
+{. swap -} pos
+{ pos mvto} init
+{ pos cpy} get
+{ pos dup 1 + del 1 - mvto} rcv
 
-{ . . cpyto } initSize
-{ . cpy } size
-{ . rcv } size=
+{ . 1 init } initSize
+{ 1 get } size
+{ 1 rcv } size=
 
-{ 0 . 1 - cpyto } initI
-{ . 1 - cpy } i
-{ . 1 - rcv } i=
+{ 0 2 init } initI
+{ 2 get } i
+{ 2 rcv } i=
 
-{ 0 . 2 - cpyto } initSwapped
-{ . 2 - cpy } swapped
-{ . 2 - rcv } swapped=
+{ 0 3 init } initSwapped
+{ 3 get } swapped
+{ 3 rcv } swapped=
 
 
 VERSÃO LEGIVEL DO ALGORITMO:
@@ -28,14 +31,14 @@ VERSÃO LEGIVEL DO ALGORITMO:
 { i inc i= }incI
 { condB doif_blockA incI condA doif_loopB}loopB
 { i cpy i 2 + cpy -}condB
-{ i cpy i inc del i inc cpyto 1 swapped=}blockA
+{ i cpy i inc del i inc mvto 1 swapped=}blockA
 
 VERSÃO ALGUTINADA DO ALGORITMO (melhora bem levemente o desempenho):
 
-{ . . cpyto 0 . 1 - cpyto 0 . 2 - cpyto loopA . del . del . del} bubbleSort
-{ 0 . 2 -  dup 1 + del 1 - cpyto 0 . 1 -  dup 1 + del 1 - cpyto loopB . 2 - cpy doif_loopA}loopA
-{ . 1 - cpy cpy . 1 - cpy 2 + cpy - doif_blockA . 1 - cpy 1 + . 1 -  dup 1 + del 1 - cpyto . cpy . 1 - cpy - doif_loopB}loopB
-{ . 1 - cpy cpy . 1 - cpy 1 + del . 1 - cpy 1 + cpyto 1 . 2 -  dup 1 + del 1 - cpyto}blockA
+{ . . mvto 0 . 1 - mvto 0 . 2 - mvto loopA . del . del . del} bubbleSort
+{ 0 . 2 -  dup 1 + del 1 - mvto 0 . 1 -  dup 1 + del 1 - mvto loopB . 2 - cpy doif_loopA}loopA
+{ . 1 - cpy cpy . 1 - cpy 2 + cpy - doif_blockA . 1 - cpy 1 + . 1 -  dup 1 + del 1 - mvto . cpy . 1 - cpy - doif_loopB}loopB
+{ . 1 - cpy cpy . 1 - cpy 1 + del . 1 - cpy 1 + mvto 1 . 2 -  dup 1 + del 1 - mvto}blockA
 
 GERAR LISTA ALEATORIA DE INTEIROS
 {repeat_rnd}randArr {10000 randi}rnd
