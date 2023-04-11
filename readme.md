@@ -6,8 +6,6 @@ A Reverse Polish Notation Calculator, with expression/macro functionality.
 
 <h1> All Operators: </h1>
 
-Math: [+] [-] [*] [/] [**|pow] [%|mod] sq sqrt [opo|neg] inv floor ceil sum mult max min rand(0~1) randi(0 to \<N-1>) \
-
 Math (1 operator): sq sqrt [ln|log] [neg|opo] inv floor ceil \
 Math (2 operators): [+] [-] [*] [/] [**|pow] [%|mod] log_ \
 Math (N operators): sum mult max min \
