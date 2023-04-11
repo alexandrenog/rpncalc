@@ -1,37 +1,15 @@
 EXPRESSOES DE CRIAÇÃO, ACESSO E MODIFICAO DAS 3 VARIAVEIS
-
-{. swap -} pos
-{ pos mvto} init
-{ pos cpy} get
-{ pos dup 1 + del 1 - mvto} rcv
-
-{ . 1 init } initSize
-{ 1 get } size
-{ 1 rcv } size=
-
-{ 0 2 init } initI
-{ 2 get } i
-{ 2 rcv } i=
-
-{ 0 3 init } initSwapped
-{ 3 get } swapped
-{ 3 rcv } swapped=
-
-
 VERSÃO LEGIVEL DO ALGORITMO:
 
-{initSize initI initSwapped}initVars
-{3 repeat_dllast}deleteVars
-{. del}dllast
-{1 +}inc
-
-{ initVars loopA deleteVars} bubbleSort
-{ 0 swapped= 0 i= loopB swapped doif_loopA}loopA
+{. set_size loopA} bubbleSort
+{ 0 set_swapped 0 set_i loopB swapped doif_loopA}loopA
 { size i - } condA
-{ i inc i= }incI
+{1 +}inc
+{ i inc set_i }incI
 { condB doif_blockA incI condA doif_loopB}loopB
 { i cpy i 2 + cpy -}condB
-{ i cpy i inc del i inc mvto 1 swapped=}blockA
+{ i cpy i inc del i inc mvto 1 set_swapped}blockA
+
 
 VERSÃO ALGUTINADA DO ALGORITMO (melhora bem levemente o desempenho):
 

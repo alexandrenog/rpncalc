@@ -65,6 +65,8 @@ enum Operator
 	Floor                          #   1.5 -> 1
 	Ceil                           #   1.5 -> 2
 	Mod                            #   10 2 -> 0, 11 2 -> 1, 20 7 -> 6
+	Ln
+	Log
 	def self.from_string(value)
 		case value
 		when "+"
@@ -145,6 +147,10 @@ enum Operator
 			Ceil
 		when "mod", "%"
 			Mod
+		when "ln", "log"
+			Ln
+		when "log_"
+			Log
 		else
 			nil
 		end
@@ -153,11 +159,14 @@ end
 enum Control
 	Repeat
 	DoIf
+	Set
 	def self.from_string(value)
 		if value.starts_with?("repeat_")
 			Repeat
 		elsif value.starts_with?("doif_")
 			DoIf
+		elsif value.starts_with?("set_")
+			Set
 		else 
 			nil
 		end
@@ -166,6 +175,7 @@ end
 
 class RPNCalc
 	INVALID_ARGUMENT = "Error: Invalid argument"
+	INVALID_EXPRESSION_NAME = ->(val : Word) {"Error: Invalid expression name, #{val}"}
 	INVALID_INDEX = "Error: Invalid index"
 	ZERO_DIVISION = "Error: Can't divide by 0"
 	MAX_DECIMAL_PLACES = 8
@@ -173,15 +183,18 @@ class RPNCalc
 	alias SimpleWord = Operator | ExpressionName | Float64
 	alias ControlType = Tuple(Control, SimpleWord, SimpleWord | Nil)
 	alias Word = SimpleWord | ControlType
-	property stack, operations
+	property stack
 	def initialize
-		@operations = %w(+ - * / ** pow sq sqrt clr clear dup cpy cpyn cpyto mvto mov pop sum mult del deln , . qtt qtty neg opo inv max min swp swap cmds help { } expr expri delxpr exit out repeat_ doif_ rand randi prtqueue prtstack floor ceil %)
-		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto mvto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack help { } floor ceil %)
-		@operations_string = "Math: [+] [-] [*] [/] [**|pow] [%|mod] sq sqrt [neg|opo] inv floor ceil sum mult max min rand(0~1) randi(0 to <N-1>)\n"
+		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto mvto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack help { } floor ceil % ln log log_)
+		@operations_string = "Math (1 operator): sq sqrt [ln|log] [neg|opo] inv floor ceil\n"
+		@operations_string+= "Math (2 operators): [+] [-] [*] [/] [**|pow] [%|mod] log_\n"
+		@operations_string+= "Math (N operators): sum mult max min\n"
+		@operations_string+= "Random Numbers: 'rand' returns a random float 0~1, 'randi' returns a random integer 0~(N-1), \n"
 		@operations_string+= "Stack Handling: dup cpy cpyn cpyto [mov|mvto] pop del deln [clr|clear] [swp|swap]\n"
 		@operations_string+= "Qtty of numbers in the line until the comma: [,]   Stack size: [.|qtt|qtty]\n"
 		@operations_string+= "Create Expression: { <w1> <w2> <w3> ... } <name>   List Expressions: expr or expri(for indexes)\nDelete Expression: <N> delxpr\n"
 		@operations_string+= "Repeat <w1> N times: repeat_<w1>    Execute <w1> or <w2> conditionally: doif_<w1>_<w2>\n"
+		@operations_string+= "Set a variable <w1>: set_<w1>   Example: 5 set_x\n"
 		@operations_string+= "Help: [help|cmds]\n"
 		@operations_string+= "Exit: [exit|out] \n"
 		@stack = Array(Float64).new
@@ -269,6 +282,17 @@ class RPNCalc
 								@input_queue.insert(0, elseword) 
 							end
 						end
+					elsif controlName == Control::Set && len(1)
+						consume 1
+						set_target = word[1]
+						if(set_target.is_a?(ExpressionName) && a.is_a?(Float64))
+							expr = [] of Word
+							expr << a
+							@expressions[set_target]=expr
+						elsif !set_target.is_a?(ExpressionName)
+							puts INVALID_EXPRESSION_NAME.call(set_target)
+							backup_from_error 
+						end
 					end
 				elsif word.is_a?(Operator)
 					if notEnoughArgumentsError = execute(word)
@@ -309,6 +333,8 @@ class RPNCalc
 			stack << a % b
 		elsif check Operator::Swap, 2 
 			addFromTwo b << a
+		elsif check Operator::Log, 2
+			addFromTwo Math.log(a,b)
 		elsif check Operator::Sq, 1
 			addFromOne a ** 2.0
 		elsif check Operator::Sqrt, 1
@@ -319,6 +345,8 @@ class RPNCalc
 			addFromOne a.floor
 		elsif check Operator::Ceil, 1
 			addFromOne a.ceil
+		elsif check Operator::Ln, 1
+			addFromOne Math.log (a)
 		elsif check Operator::Inv, 1
 			consume 1
 			return ZERO_DIVISION if a == 0

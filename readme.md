@@ -7,6 +7,11 @@ A Reverse Polish Notation Calculator, with expression/macro functionality.
 <h1> All Operators: </h1>
 
 Math: [+] [-] [*] [/] [**|pow] [%|mod] sq sqrt [opo|neg] inv floor ceil sum mult max min rand(0~1) randi(0 to \<N-1>) \
+
+Math (1 operator): sq sqrt [ln|log] [neg|opo] inv floor ceil \
+Math (2 operators): [+] [-] [*] [/] [**|pow] [%|mod] log_ \
+Math (N operators): sum mult max min \
+Random Numbers: 'rand' returns a random float 0~1, 'randi' returns a random integer 0~(N-1) \
 Stack Handling: dup cpy cpyn cpyto pop del deln [clr|clear] [swp|swap]  \
 Qtty of numbers in the line until the comma: [,]   </br>
 Stack size: [.|qtt|qtty]  
@@ -15,6 +20,7 @@ List Expressions: expr or expri(for indexes) </br>
 Delete Expression: \<N> delxpr  </br>
 Repeat \<w1> N times: repeat_\<w1>  
 Execute \<w1> or \<w2> conditionally: doif_\<w1>_\<w2>   
+Set a variable \<w1>: set_\<w1>   Example: 5 set_x </br> 
 Help: [help|cmds]   
 Exit: [exit|out] 
 
