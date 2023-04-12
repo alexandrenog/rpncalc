@@ -133,7 +133,7 @@ enum Operator
 			RandI
 		when "prtqueue"
 			PrintQueue
-		when "prtstack"
+		when "prtstack", "#"
 			PrintStack
 		when "cmds", "help"
 			Help
@@ -185,7 +185,7 @@ class RPNCalc
 	alias Word = SimpleWord | ControlType
 	property stack
 	def initialize
-		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto mvto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack help { } floor ceil % ln log log_)
+		@operations_dict = %w(+ sum - * mult / ** sq sqrt inv clr swap dup cpy cpyn cpyto mvto pop del deln , . opo max min expr expri delxpr out rand randi prtqueue prtstack # help { } floor ceil % ln log log_)
 		@operations_string = "Math (1 operator): sq sqrt [ln|log] [neg|opo] inv floor ceil\n"
 		@operations_string+= "Math (2 operators): [+] [-] [*] [/] [**|pow] [%|mod] log_\n"
 		@operations_string+= "Math (N operators): sum mult max min\n"
@@ -496,6 +496,8 @@ class RPNCalc
 			end
 		elsif(w[0] == Control::Repeat)
 			str += "repeat_" + formatWord(w[1])
+		elsif(w[0] == Control::Set)
+			str += "set_" + formatWord(w[1])
 		end
 		return str
 	end
